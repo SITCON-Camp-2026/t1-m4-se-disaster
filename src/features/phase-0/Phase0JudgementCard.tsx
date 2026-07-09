@@ -46,8 +46,8 @@ export function Phase0JudgementCard({
       </div>
 
       <p>
-        這張卡只保留保守的安全邊界，不是 agent 對這筆資料的整理答案。請讓 coding
-        agent 實作可建立、編輯與刪除的整理草稿。
+        這張卡只保留保守的安全邊界，不是 agent 對這筆資料的整理答案。請 agent
+        加上建立、編輯、刪除或重設整理草稿。
       </p>
 
       <dl className="judgement-summary">

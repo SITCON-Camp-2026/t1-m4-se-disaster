@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import messyReports from "../src/fixtures/phase-0/messy-reports.json";
-import { createPhase0Judgement } from "../src/features/phase-0/phase0-heuristics";
+import {
+  createPhase0Drafts,
+  createPhase0Judgement,
+} from "../src/features/phase-0/phase0-heuristics";
+import { filterDraftsByQuery } from "../src/features/phase-0/Phase0Workbench";
 
 describe("phase 0 heuristics", () => {
   it("loads the current phase 0 messy data", () => {
@@ -41,5 +45,48 @@ describe("phase 0 heuristics", () => {
 
     expect(judgement.possibleKind).toBe("unknown");
     expect(judgement.suggestedNextStep).toBe("send_to_human_review");
+  });
+
+  it("creates editable drafts for multiple records with review and task blockers", () => {
+    const drafts = createPhase0Drafts(messyReports);
+
+    expect(drafts.length).toBeGreaterThanOrEqual(6);
+    expect(drafts.filter((draft) => draft.humanReviewNote).length).toBeGreaterThan(0);
+    expect(drafts.filter((draft) => draft.cannotDirectlyBecomeTask).length).toBeGreaterThanOrEqual(3);
+    expect(drafts.some((draft) => draft.possibleKind === "site_status_candidate")).toBe(true);
+  });
+
+  it("creates varied reasons and marks a couple of drafts as more trustworthy", () => {
+    const drafts = createPhase0Drafts(messyReports);
+
+    expect(drafts.some((draft) => draft.trustLevel === "high")).toBe(true);
+    expect(drafts.filter((draft) => draft.blockers.length >= 2).length).toBeGreaterThan(2);
+    expect(drafts.some((draft) => draft.blockers.some((reason) => reason.includes("可信")))).toBe(true);
+  });
+
+  it("groups records from the same source type into the same candidate kind", () => {
+    const fieldReportRecords = messyReports.filter(
+      (record) => record.sourceType === "field_report",
+    );
+    const drafts = createPhase0Drafts(fieldReportRecords);
+
+    expect(new Set(drafts.map((draft) => draft.possibleKind)).size).toBe(1);
+    expect(drafts[0].possibleKind).toBe("site_status_candidate");
+  });
+
+  it("filters drafts by a keyword across summary, note, review notes, and blockers", () => {
+    const drafts = createPhase0Drafts(messyReports);
+    const filtered = filterDraftsByQuery(drafts, "資訊");
+
+    expect(filtered.length).toBeGreaterThan(0);
+    expect(
+      filtered.every(
+        (draft) =>
+          draft.summary.includes("資訊") ||
+          draft.note.includes("資訊") ||
+          draft.humanReviewNote?.includes("資訊") ||
+          draft.blockers.some((reason) => reason.includes("資訊")),
+      ),
+    ).toBe(true);
   });
 });

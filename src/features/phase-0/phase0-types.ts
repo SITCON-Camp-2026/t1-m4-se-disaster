@@ -35,3 +35,21 @@ export type Phase0JudgementDraft = {
   unsafeToActDirectly: boolean;
   humanReviewNote?: string;
 };
+
+export type Phase0TrustLevel = "low" | "medium" | "high";
+
+export type Phase0Draft = {
+  trustScore: number;
+  messyRecordId: string;
+  possibleKind: Phase0PossibleKind;
+  confidence: Phase0Confidence;
+  trustLevel: Phase0TrustLevel;
+  evidence: string[];
+  blockers: string[];
+  suggestedNextStep: Phase0SuggestedNextStep;
+  unsafeToActDirectly: boolean;
+  humanReviewNote?: string;
+  cannotDirectlyBecomeTask: boolean;
+  note: string;
+  summary: string;
+};
