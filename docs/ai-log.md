@@ -33,6 +33,10 @@
 | 2026-07-09 | Phase 0    | 上移完成檢查框     | 建議把完成檢查從右欄移到工作台上方，改成短數字摘要                                  | 採用        | 右欄會壓縮整理草稿區，上移後主欄更寬，且不改任何資料判斷                 | `src/features/phase-0/Phase0Workbench.tsx`, `src/styles/global.css`                              |
 | 2026-07-09 | Release 02 | 繪製開始確認流程圖 | 建議用資訊整理者「開始確認」作為 v1 主流程，產生自然語言流程與 Mermaid              | 採用        | 流程從原始資訊開始，保留人工確認與不能自動處理分支，避免 AI 成為決策者   | `docs/flow.md`, `docs/decisions.md`                                                              |
 | 2026-07-09 | Release 02 | 產生流程圖圖片     | 建議把 Mermaid 流程轉成 SVG 圖片並嵌回 `docs/flow.md`                               | 採用        | 圖片方便展示與預覽，但仍保留 Mermaid 原文供後續修正                      | `docs/flow.svg`, `docs/flow.md`                                                                  |
+| 2026-07-09 | Release 03 | 實作 v1 開始確認頁 | 建議依 `docs/flow.md` 建立 `/v1/` 前端，使用 Phase 0 原始資訊做流程分流             | 採用        | 只做前端工作台，不新增資料來源，也不把候選草稿顯示成已確認               | `src/app/App.tsx`, `src/features/v1/V1FlowWorkbench.tsx`                                         |
+| 2026-07-09 | Release 03 | 標示低信任理由     | 建議為每筆原始資訊產生低信任注記，並在 v1 清單與詳情顯示                            | 採用        | 注記只說明不能直接相信的原因，不是真偽判定；仍需人類確認                 | `src/features/v1/v1-flow.ts`, `src/features/v1/V1FlowWorkbench.tsx`                              |
+| 2026-07-09 | Release 03 | 調整前端視覺風格   | 建議用高對比漫畫分鏡、網點、速度線與厚重陰影建立熱血漫畫感                          | 採用        | 只調整 CSS 視覺，不加入原作素材、真實資料或改變任何資料判斷              | `src/styles/global.css`                                                                          |
+| 2026-07-09 | Release 03 | 新增風格切換       | 建議保留熱血漫畫，另加指揮中心、報紙剪報與夜間終端三種可切換風格                    | 採用        | 風格切換只影響前端呈現，不使用 localStorage，也不改變任何資料或查核狀態  | `src/app/App.tsx`, `src/styles/global.css`, `tests/app-smoke.test.tsx`                           |
 
 ## 範例
 
