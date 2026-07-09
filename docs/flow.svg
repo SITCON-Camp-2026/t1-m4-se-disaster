@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="2200" viewBox="0 0 1400 2200" role="img" aria-labelledby="title desc">
+  <title id="title">v1 開始確認資訊流程圖</title>
+  <desc id="desc">從原始資訊進入，到人工確認、候選草稿、暫時不採用與留下判斷紀錄的流程圖。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7a3414" />
+    </marker>
+    <style>
+      .bg { fill: #fffaf1; }
+      .title { font: 700 34px "Noto Sans TC", "Microsoft JhengHei", sans-serif; fill: #2f1b12; }
+      .subtitle { font: 500 20px "Noto Sans TC", "Microsoft JhengHei", sans-serif; fill: #6b4b3b; }
+      .node { fill: #fffdf7; stroke: #a72112; stroke-width: 3; }
+      .check { fill: #fff4d8; stroke: #b66b1c; stroke-width: 3; }
+      .manual { fill: #fff3cd; stroke: #b66b1c; stroke-width: 3; }
+      .blocked { fill: #fde2e1; stroke: #9f1f17; stroke-width: 3; }
+      .candidate { fill: #e6f5eb; stroke: #2f7d43; stroke-width: 3; }
+      .record { fill: #eef6ff; stroke: #245d9d; stroke-width: 3; }
+      .end { fill: #f4f7fb; stroke: #344054; stroke-width: 3; }
+      .label { font: 700 22px "Noto Sans TC", "Microsoft JhengHei", sans-serif; fill: #2f1b12; text-anchor: middle; dominant-baseline: middle; }
+      .small { font: 600 18px "Noto Sans TC", "Microsoft JhengHei", sans-serif; fill: #5f3c2a; text-anchor: middle; }
+      .edge { fill: none; stroke: #7a3414; stroke-width: 3; marker-end: url(#arrow); }
+      .edge-muted { fill: none; stroke: #9a7a66; stroke-width: 2.5; marker-end: url(#arrow); }
+      .tag { fill: #ffffff; stroke: #d6b58c; stroke-width: 2; }
+      .tag-text { font: 700 16px "Noto Sans TC", "Microsoft JhengHei", sans-serif; fill: #7a3414; text-anchor: middle; dominant-baseline: middle; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1400" height="2200" />
+  <text class="title" x="700" y="56" text-anchor="middle">v1 開始確認資訊流程圖</text>
+  <text class="subtitle" x="700" y="92" text-anchor="middle">先保留原始資訊，再由人確認是否能形成候選草稿</text>
+
+  <rect class="node" x="500" y="135" rx="18" ry="18" width="400" height="82" />
+  <text class="label" x="700" y="176">原始資訊進入</text>
+
+  <path class="edge" d="M 700 217 L 700 277" />
+  <rect class="node" x="450" y="277" rx="18" ry="18" width="500" height="96" />
+  <text class="label" x="700" y="312">
+    <tspan x="700" dy="0">開始確認</tspan>
+    <tspan x="700" dy="30">保留原文與來源</tspan>
+  </text>
+
+  <path class="edge" d="M 700 373 L 700 442" />
+  <polygon class="check" points="700,442 990,542 700,642 410,542" />
+  <text class="label" x="700" y="516">
+    <tspan x="700" dy="0">來源、查核狀態、</tspan>
+    <tspan x="700" dy="30">更新時間是否分開？</tspan>
+  </text>
+
+  <rect class="tag" x="472" y="502" rx="12" ry="12" width="64" height="34" />
+  <text class="tag-text" x="504" y="519">否</text>
+  <path class="edge-muted" d="M 468 542 L 260 542 L 260 674" />
+  <rect class="manual" x="80" y="674" rx="18" ry="18" width="360" height="96" />
+  <text class="label" x="260" y="708">
+    <tspan x="260" dy="0">補上缺口標示</tspan>
+    <tspan x="260" dy="30">需要人工確認</tspan>
+  </text>
+
+  <rect class="tag" x="832" y="620" rx="12" ry="12" width="64" height="34" />
+  <text class="tag-text" x="864" y="637">是</text>
+  <path class="edge" d="M 700 642 L 700 720" />
+  <polygon class="check" points="700,720 980,820 700,920 420,820" />
+  <text class="label" x="700" y="794">
+    <tspan x="700" dy="0">時間、地點、當事人、</tspan>
+    <tspan x="700" dy="30">確認者是否足夠？</tspan>
+  </text>
+
+  <rect class="tag" x="468" y="780" rx="12" ry="12" width="64" height="34" />
+  <text class="tag-text" x="500" y="797">否</text>
+  <path class="edge-muted" d="M 466 820 L 260 820 L 260 952" />
+  <rect class="manual" x="80" y="952" rx="18" ry="18" width="360" height="96" />
+  <text class="label" x="260" y="986">
+    <tspan x="260" dy="0">人工確認</tspan>
+    <tspan x="260" dy="30">補資料或保留原始資訊</tspan>
+  </text>
+
+  <rect class="tag" x="832" y="898" rx="12" ry="12" width="64" height="34" />
+  <text class="tag-text" x="864" y="915">是</text>
+  <path class="edge" d="M 700 920 L 700 998" />
+  <polygon class="check" points="700,998 990,1098 700,1198 410,1098" />
+  <text class="label" x="700" y="1072">
+    <tspan x="700" dy="0">是否有過期、衝突、</tspan>
+    <tspan x="700" dy="30">隱私或轉述風險？</tspan>
+  </text>
+
+  <rect class="tag" x="468" y="1058" rx="12" ry="12" width="64" height="34" />
+  <text class="tag-text" x="500" y="1075">有</text>
+  <path class="edge-muted" d="M 466 1098 L 260 1098 L 260 1230" />
+  <rect class="blocked" x="80" y="1230" rx="18" ry="18" width="360" height="96" />
+  <text class="label" x="260" y="1264">
+    <tspan x="260" dy="0">暫時不採用</tspan>
+    <tspan x="260" dy="30">為候選結果</tspan>
+  </text>
+
+  <rect class="tag" x="790" y="1176" rx="12" ry="12" width="132" height="34" />
+  <text class="tag-text" x="856" y="1193">沒有明顯風險</text>
+  <path class="edge" d="M 700 1198 L 700 1276" />
+  <polygon class="check" points="700,1276 990,1376 700,1476 410,1376" />
+  <text class="label" x="700" y="1350">
+    <tspan x="700" dy="0">是否足以形成</tspan>
+    <tspan x="700" dy="30">候選草稿？</tspan>
+  </text>
+
+  <rect class="tag" x="468" y="1336" rx="12" ry="12" width="64" height="34" />
+  <text class="tag-text" x="500" y="1353">否</text>
+  <path class="edge-muted" d="M 466 1376 L 260 1376 L 260 1508" />
+  <rect class="blocked" x="80" y="1508" rx="18" ry="18" width="360" height="96" />
+  <text class="label" x="260" y="1542">
+    <tspan x="260" dy="0">保留為原始資訊</tspan>
+    <tspan x="260" dy="30">不轉成任務</tspan>
+  </text>
+
+  <rect class="tag" x="832" y="1454" rx="12" ry="12" width="64" height="34" />
+  <text class="tag-text" x="864" y="1471">是</text>
+  <path class="edge" d="M 700 1476 L 700 1536" />
+  <rect class="candidate" x="470" y="1536" rx="18" ry="18" width="460" height="100" />
+  <text class="label" x="700" y="1571">
+    <tspan x="700" dy="0">建立候選草稿</tspan>
+    <tspan x="700" dy="30">仍標示需要人工確認</tspan>
+  </text>
+
+  <path class="edge" d="M 700 1636 L 700 1708" />
+  <polygon class="check" points="700,1708 970,1800 700,1892 430,1800" />
+  <text class="label" x="700" y="1784">
+    <tspan x="700" dy="0">人類是否採用</tspan>
+    <tspan x="700" dy="30">候選草稿？</tspan>
+  </text>
+
+  <rect class="tag" x="562" y="1870" rx="12" ry="12" width="64" height="34" />
+  <text class="tag-text" x="594" y="1887">採用</text>
+  <path class="edge" d="M 626 1848 L 520 1932" />
+  <rect class="candidate" x="280" y="1932" rx="18" ry="18" width="400" height="90" />
+  <text class="label" x="480" y="1977">保留候選結果與理由</text>
+
+  <rect class="tag" x="824" y="1870" rx="12" ry="12" width="80" height="34" />
+  <text class="tag-text" x="864" y="1887">不採用</text>
+  <path class="edge-muted" d="M 780 1848 L 890 1932" />
+  <rect class="blocked" x="720" y="1932" rx="18" ry="18" width="400" height="90" />
+  <text class="label" x="920" y="1977">退回或暫停，保留原因</text>
+
+  <path class="edge-muted" d="M 260 770 L 260 2070 L 562 2070" />
+  <path class="edge-muted" d="M 260 1048 L 260 2070" />
+  <path class="edge-muted" d="M 260 1326 L 260 2070" />
+  <path class="edge-muted" d="M 260 1604 L 260 2070" />
+  <path class="edge" d="M 480 2022 L 600 2070" />
+  <path class="edge-muted" d="M 920 2022 L 800 2070" />
+
+  <rect class="record" x="562" y="2034" rx="18" ry="18" width="276" height="72" />
+  <text class="label" x="700" y="2070">留下判斷紀錄</text>
+
+  <path class="edge" d="M 700 2106 L 700 2144" />
+  <rect class="end" x="460" y="2144" rx="18" ry="18" width="480" height="46" />
+  <text class="label" x="700" y="2167">結束：下一位協作者可追溯判斷</text>
+</svg>
