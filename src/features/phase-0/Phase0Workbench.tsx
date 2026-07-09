@@ -1,45 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { RecordCard } from "../../components/RecordCard";
 import { StatusBadge } from "../../components/StatusBadge";
+import { filterDraftsByQuery } from "./phase0-draft-search";
 import { Phase0JudgementCard } from "./Phase0JudgementCard";
+import { OrganizerView } from "./OrganizerView";
+import { OrganizerInspectorPanel } from "./OrganizerInspectorPanel";
 import { createPhase0Drafts, createPhase0Judgement } from "./phase0-heuristics";
 import type { Phase0Draft, Phase0MessyRecord } from "./phase0-types";
-
-export function filterDraftsByQuery(drafts: Phase0Draft[], query: string) {
-  const normalizedQuery = query.trim().toLowerCase();
-
-  if (!normalizedQuery) {
-    return drafts;
-  }
-
-  const tokens = normalizedQuery.split(/\s+/).filter(Boolean);
-
-  return drafts.filter((draft) => {
-    const searchableText = [
-      draft.messyRecordId,
-      draft.summary,
-      draft.note,
-      draft.humanReviewNote ?? "",
-      draft.possibleKind,
-      draft.trustLevel,
-      ...draft.blockers,
-      ...draft.evidence,
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase();
-
-    return tokens.every((token) => {
-      const chars = [...token.replace(/[^a-z0-9\u4e00-\u9fff]/g, "")];
-
-      if (!chars.length) {
-        return false;
-      }
-
-      return chars.some((char) => searchableText.includes(char));
-    });
-  });
-}
+import { TimeStatusClassificationView } from "./TimeStatusClassificationView";
+import { TrustClassificationView } from "./TrustClassificationView";
 
 export function Phase0Workbench({
   records,
@@ -57,6 +26,12 @@ export function Phase0Workbench({
   const [drafts, setDrafts] = useState<Phase0Draft[]>(initialDrafts);
   const [selectedDraftId, setSelectedDraftId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const reviewDraftCount = drafts.filter(
+    (draft) => draft.humanReviewNote,
+  ).length;
+  const blockedTaskCount = drafts.filter(
+    (draft) => draft.cannotDirectlyBecomeTask,
+  ).length;
   const visibleDrafts = useMemo(
     () => filterDraftsByQuery(drafts, searchQuery),
     [drafts, searchQuery],
@@ -70,27 +45,10 @@ export function Phase0Workbench({
     drafts.find((draft) => draft.messyRecordId === selectedRecord.id) ??
     drafts[0];
 
-  useEffect(() => {
-    if (!drafts.length) {
-      setSelectedDraftId(null);
-      return;
-    }
-
-    const fallbackDraft =
-      visibleDrafts.find((draft) => draft.messyRecordId === selectedRecord.id) ??
-      visibleDrafts[0] ??
-      drafts.find((draft) => draft.messyRecordId === selectedRecord.id) ??
-      drafts[0];
-
-    setSelectedDraftId((current) => {
-      if (current && visibleDrafts.some((draft) => draft.messyRecordId === current)) {
-        return current;
-      }
-      return fallbackDraft?.messyRecordId ?? null;
-    });
-  }, [drafts, visibleDrafts, selectedRecord.id]);
-
-  function updateDraft<K extends keyof Phase0Draft>(field: K, value: Phase0Draft[K]) {
+  function updateDraft<K extends keyof Phase0Draft>(
+    field: K,
+    value: Phase0Draft[K],
+  ) {
     if (!selectedDraft) {
       return;
     }
@@ -125,7 +83,9 @@ export function Phase0Workbench({
     }
 
     setDrafts((current) =>
-      current.filter((draft) => draft.messyRecordId !== selectedDraft.messyRecordId),
+      current.filter(
+        (draft) => draft.messyRecordId !== selectedDraft.messyRecordId,
+      ),
     );
     setSelectedDraftId(null);
   }
@@ -148,6 +108,31 @@ export function Phase0Workbench({
         </p>
       </div>
 
+      <section className="phase-check" aria-label="第一階段完成檢查">
+        <div className="phase-check__header">
+          <h3>第一階段完成檢查</h3>
+          <span>請補 observations / ai-log</span>
+        </div>
+        <ul>
+          <li>
+            <strong>{records.length}</strong>
+            <span>原始資訊</span>
+          </li>
+          <li>
+            <strong>{drafts.length}</strong>
+            <span>整理草稿</span>
+          </li>
+          <li>
+            <strong>{reviewDraftCount}</strong>
+            <span>人工確認</span>
+          </li>
+          <li>
+            <strong>{blockedTaskCount}</strong>
+            <span>不能成任務</span>
+          </li>
+        </ul>
+      </section>
+
       <div className="workbench__layout">
         <aside className="workbench__queue" aria-label="選擇原始資訊">
           {records.map((record) => (
@@ -166,13 +151,35 @@ export function Phase0Workbench({
         <div className="workbench__main">
           <RecordCard record={selectedRecord} />
 
-          <Phase0JudgementCard judgement={safetyBoundary} record={selectedRecord} />
+          <Phase0JudgementCard
+            judgement={safetyBoundary}
+            record={selectedRecord}
+          />
+
+          <OrganizerView record={selectedRecord} />
+
+          <TimeStatusClassificationView
+            records={records}
+            selectedRecordId={selectedRecord.id}
+            onSelect={onSelect}
+          />
+
+          <OrganizerInspectorPanel
+            records={records}
+            selectedRecord={selectedRecord}
+            selectedDraft={selectedDraft}
+            onSelect={onSelect}
+          />
+
+          <TrustClassificationView drafts={drafts} />
 
           <section className="draft-editor" aria-label="整理草稿">
             <div className="panel__header">
               <div>
                 <h3>可編輯整理草稿</h3>
-                <p>現在可直接新增、刪除草稿，並查看為什麼這筆資訊不能直接成為任務。</p>
+                <p>
+                  現在可直接新增、刪除草稿，並查看為什麼這筆資訊不能直接成為任務。
+                </p>
               </div>
               <div className="draft-editor__actions">
                 <span className="draft-count">{drafts.length} 筆</span>
@@ -199,7 +206,9 @@ export function Phase0Workbench({
               <aside className="draft-editor__list" aria-label="草稿清單">
                 <div className="draft-editor__list-header">
                   <h4>草稿清單</h4>
-                  <span>{visibleDrafts.length}/{drafts.length} 項</span>
+                  <span>
+                    {visibleDrafts.length}/{drafts.length} 項
+                  </span>
                 </div>
                 {visibleDrafts.length ? (
                   visibleDrafts.map((draft) => (
@@ -207,7 +216,9 @@ export function Phase0Workbench({
                       key={draft.messyRecordId}
                       type="button"
                       className={
-                        draft.messyRecordId === selectedDraft?.messyRecordId ? "active" : ""
+                        draft.messyRecordId === selectedDraft?.messyRecordId
+                          ? "active"
+                          : ""
                       }
                       onClick={() => setSelectedDraftId(draft.messyRecordId)}
                     >
@@ -237,7 +248,7 @@ export function Phase0Workbench({
                     </button>
                   </div>
 
-                  <label>
+                  <label className="draft-editor__field--candidate">
                     <span>候選類型</span>
                     <select
                       value={selectedDraft.possibleKind}
@@ -249,7 +260,9 @@ export function Phase0Workbench({
                       }
                     >
                       <option value="help_request_candidate">求助候選</option>
-                      <option value="site_status_candidate">地點狀態候選</option>
+                      <option value="site_status_candidate">
+                        地點狀態候選
+                      </option>
                       <option value="task_candidate">任務候選</option>
                       <option value="assignment_candidate">人員指派候選</option>
                       <option value="announcement_candidate">公告候選</option>
@@ -261,7 +274,9 @@ export function Phase0Workbench({
                     <span>摘要</span>
                     <textarea
                       value={selectedDraft.summary}
-                      onChange={(event) => updateDraft("summary", event.target.value)}
+                      onChange={(event) =>
+                        updateDraft("summary", event.target.value)
+                      }
                     />
                   </label>
 
@@ -269,7 +284,9 @@ export function Phase0Workbench({
                     <span>筆記</span>
                     <textarea
                       value={selectedDraft.note}
-                      onChange={(event) => updateDraft("note", event.target.value)}
+                      onChange={(event) =>
+                        updateDraft("note", event.target.value)
+                      }
                     />
                   </label>
 
@@ -277,7 +294,9 @@ export function Phase0Workbench({
                     <span>人工確認備註</span>
                     <textarea
                       value={selectedDraft.humanReviewNote ?? ""}
-                      onChange={(event) => updateDraft("humanReviewNote", event.target.value)}
+                      onChange={(event) =>
+                        updateDraft("humanReviewNote", event.target.value)
+                      }
                     />
                   </label>
 
@@ -331,7 +350,9 @@ export function Phase0Workbench({
                       <textarea
                         className="review-box__textarea"
                         value={selectedDraft.note}
-                        onChange={(event) => updateDraft("note", event.target.value)}
+                        onChange={(event) =>
+                          updateDraft("note", event.target.value)
+                        }
                         placeholder="請輸入你對這筆草稿的判斷、風險與下一步建議。"
                       />
                     </label>
@@ -343,7 +364,10 @@ export function Phase0Workbench({
                         type="checkbox"
                         checked={selectedDraft.cannotDirectlyBecomeTask}
                         onChange={(event) =>
-                          updateDraft("cannotDirectlyBecomeTask", event.target.checked)
+                          updateDraft(
+                            "cannotDirectlyBecomeTask",
+                            event.target.checked,
+                          )
                         }
                       />
                       <span>不能直接變成任務</span>
@@ -354,19 +378,6 @@ export function Phase0Workbench({
             </div>
           </section>
         </div>
-
-        <aside className="workbench__checklist">
-          <h3>第一階段完成檢查</h3>
-          <ul>
-            <li>Starter 已載入 {records.length} 筆原始資訊</li>
-            <li>已建立 {drafts.length} 筆可編輯整理草稿</li>
-            <li>至少 {drafts.filter((draft) => draft.humanReviewNote).length} 筆有人工確認標記</li>
-            <li>
-              至少 {drafts.filter((draft) => draft.cannotDirectlyBecomeTask).length} 筆被標記為不能直接變成任務
-            </li>
-            <li>請在 observations 與 ai-log 補上資料品質問題與人類判斷</li>
-          </ul>
-        </aside>
       </div>
     </div>
   );

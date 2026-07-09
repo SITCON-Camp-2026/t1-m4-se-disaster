@@ -4,7 +4,12 @@ import {
   createPhase0Drafts,
   createPhase0Judgement,
 } from "../src/features/phase-0/phase0-heuristics";
-import { filterDraftsByQuery } from "../src/features/phase-0/Phase0Workbench";
+import { filterDraftsByQuery } from "../src/features/phase-0/phase0-draft-search";
+import { createOrganizerInsight } from "../src/features/phase-0/organizer-insights";
+import {
+  classifyRecordByTimeStatus,
+  groupRecordsByTimeStatus,
+} from "../src/features/phase-0/time-status";
 
 describe("phase 0 heuristics", () => {
   it("loads the current phase 0 messy data", () => {
@@ -51,17 +56,29 @@ describe("phase 0 heuristics", () => {
     const drafts = createPhase0Drafts(messyReports);
 
     expect(drafts.length).toBeGreaterThanOrEqual(6);
-    expect(drafts.filter((draft) => draft.humanReviewNote).length).toBeGreaterThan(0);
-    expect(drafts.filter((draft) => draft.cannotDirectlyBecomeTask).length).toBeGreaterThanOrEqual(3);
-    expect(drafts.some((draft) => draft.possibleKind === "site_status_candidate")).toBe(true);
+    expect(
+      drafts.filter((draft) => draft.humanReviewNote).length,
+    ).toBeGreaterThan(0);
+    expect(
+      drafts.filter((draft) => draft.cannotDirectlyBecomeTask).length,
+    ).toBeGreaterThanOrEqual(3);
+    expect(
+      drafts.some((draft) => draft.possibleKind === "site_status_candidate"),
+    ).toBe(true);
   });
 
   it("creates varied reasons and marks a couple of drafts as more trustworthy", () => {
     const drafts = createPhase0Drafts(messyReports);
 
     expect(drafts.some((draft) => draft.trustLevel === "high")).toBe(true);
-    expect(drafts.filter((draft) => draft.blockers.length >= 2).length).toBeGreaterThan(2);
-    expect(drafts.some((draft) => draft.blockers.some((reason) => reason.includes("可信")))).toBe(true);
+    expect(
+      drafts.filter((draft) => draft.blockers.length >= 2).length,
+    ).toBeGreaterThan(2);
+    expect(
+      drafts.some((draft) =>
+        draft.blockers.some((reason) => reason.includes("可信")),
+      ),
+    ).toBe(true);
   });
 
   it("groups records from the same source type into the same candidate kind", () => {
@@ -88,5 +105,57 @@ describe("phase 0 heuristics", () => {
           draft.blockers.some((reason) => reason.includes("資訊")),
       ),
     ).toBe(true);
+  });
+
+  it("groups time status conservatively without treating updatedAt as validity", () => {
+    const groups = groupRecordsByTimeStatus(messyReports);
+
+    expect(groups.expired.map((item) => item.record.id)).toEqual([
+      "M-002",
+      "M-003",
+      "M-005",
+      "M-007",
+    ]);
+    expect(groups.unknown.some((item) => item.record.id === "M-001")).toBe(
+      true,
+    );
+    expect(groups.known.map((item) => item.record.id)).toEqual([
+      "M-009",
+      "M-010",
+    ]);
+    expect(groups.known.map((item) => item.timeLabel)).toEqual([
+      "14:20",
+      "14:35",
+    ]);
+  });
+
+  it("puts records without a marked information time into time unknown", () => {
+    const classified = classifyRecordByTimeStatus({
+      id: "M-test",
+      rawText: "現場說可能需要協助，但沒有標示時間。",
+      sourceType: "field_report",
+      verificationStatus: "needs_review",
+    });
+
+    expect(classified.status).toBe("unknown");
+    expect(classified.timeLabel).toBe("未標示時間");
+  });
+
+  it("creates organizer insights without turning gaps into confirmed facts", () => {
+    const drafts = createPhase0Drafts(messyReports);
+    const insight = createOrganizerInsight({
+      records: messyReports,
+      selectedRecord: messyReports[9],
+      selectedDraft: drafts[9],
+    });
+
+    expect(insight.qualityGaps.map((gap) => gap.label)).toContain("資訊時間");
+    expect(
+      insight.conflictGroups.some((group) => group.topic.includes("雨鞋")),
+    ).toBe(true);
+    expect(insight.confirmationQuestions.length).toBeGreaterThan(0);
+    expect(insight.comparison.reviewWarnings.join(" ")).toContain(
+      "不得被顯示成已確認",
+    );
   });
 });

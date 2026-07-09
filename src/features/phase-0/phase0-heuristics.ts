@@ -23,7 +23,9 @@ export function createPhase0Judgement(
   };
 }
 
-function inferCandidateKindBySource(sourceType: string): Phase0Draft["possibleKind"] {
+function inferCandidateKindBySource(
+  sourceType: string,
+): Phase0Draft["possibleKind"] {
   switch (sourceType) {
     case "field_report":
     case "volunteer_update":
@@ -38,7 +40,9 @@ function inferCandidateKindBySource(sourceType: string): Phase0Draft["possibleKi
   }
 }
 
-export function createPhase0Drafts(records: Phase0MessyRecord[]): Phase0Draft[] {
+export function createPhase0Drafts(
+  records: Phase0MessyRecord[],
+): Phase0Draft[] {
   return records.map((record, index) => {
     const isReviewNeeded = record.verificationStatus === "needs_review";
     const isUnverified = record.verificationStatus === "unverified";
@@ -57,7 +61,11 @@ export function createPhase0Drafts(records: Phase0MessyRecord[]): Phase0Draft[] 
                 : record.sourceType;
 
     const trustLevel: Phase0Draft["trustLevel"] =
-      record.id === "M-010" || record.id === "M-009" ? "high" : index < 3 ? "medium" : "low";
+      record.id === "M-010" || record.id === "M-009"
+        ? "high"
+        : index < 3
+          ? "medium"
+          : "low";
     const trustScore =
       trustLevel === "high" ? 8.5 : trustLevel === "medium" ? 6.5 : 4.5;
 
@@ -90,7 +98,9 @@ export function createPhase0Drafts(records: Phase0MessyRecord[]): Phase0Draft[] 
         `原文片段：${record.rawText.slice(0, 80)}…`,
       ],
       blockers,
-      suggestedNextStep: isReviewNeeded ? "send_to_human_review" : "ask_for_more_info",
+      suggestedNextStep: isReviewNeeded
+        ? "send_to_human_review"
+        : "ask_for_more_info",
       unsafeToActDirectly: true,
       humanReviewNote:
         isReviewNeeded || isUnverified

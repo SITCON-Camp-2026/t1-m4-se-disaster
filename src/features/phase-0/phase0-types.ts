@@ -22,7 +22,7 @@ export type Phase0MessyRecord = {
   rawText: string;
   sourceType: string;
   verificationStatus: string;
-  updatedAt: string;
+  updatedAt?: string;
 };
 
 export type Phase0JudgementDraft = {

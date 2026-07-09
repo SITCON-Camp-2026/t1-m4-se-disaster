@@ -10,7 +10,7 @@ type RecordLike = {
   description?: string;
   sourceType: string;
   verificationStatus: string;
-  updatedAt: string;
+  updatedAt?: string;
 };
 
 export function RecordCard({ record }: { record: RecordLike }) {

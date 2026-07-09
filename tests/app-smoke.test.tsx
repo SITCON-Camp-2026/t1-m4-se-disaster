@@ -45,6 +45,43 @@ describe("App", () => {
     expect(screen.getAllByText("未查核").length).toBeGreaterThan(0);
   });
 
+  it("shows organizer-focused source, status, and actionability guidance", () => {
+    render(<App />);
+
+    fireEvent.click(screen.getByRole("button", { name: "整理工作台" }));
+
+    expect(screen.getByText("資訊來源")).toBeInTheDocument();
+    expect(screen.getAllByText("查核狀態").length).toBeGreaterThan(0);
+    expect(screen.getByText("行動可行性")).toBeInTheDocument();
+    expect(
+      screen.getAllByText("不能直接成為任務的理由").length,
+    ).toBeGreaterThan(0);
+  });
+
+  it("shows conservative time status grouping in the workbench", () => {
+    render(<App />);
+
+    fireEvent.click(screen.getByRole("button", { name: "整理工作台" }));
+
+    expect(screen.getByText("時間狀態分類")).toBeInTheDocument();
+    expect(screen.getByText("已過期區")).toBeInTheDocument();
+    expect(screen.getByText("時間未知")).toBeInTheDocument();
+    expect(screen.getByText("依時間排序")).toBeInTheDocument();
+    expect(screen.getByText("14:20")).toBeInTheDocument();
+  });
+
+  it("shows organizer inspection tools in the workbench", () => {
+    render(<App />);
+
+    fireEvent.click(screen.getByRole("button", { name: "整理工作台" }));
+
+    expect(screen.getByText("整理者檢查面板")).toBeInTheDocument();
+    expect(screen.getByText("資料品質缺口表")).toBeInTheDocument();
+    expect(screen.getByText("可能衝突提醒")).toBeInTheDocument();
+    expect(screen.getByText("人工確認清單")).toBeInTheDocument();
+    expect(screen.getByText("原文 vs 整理草稿對照")).toBeInTheDocument();
+  });
+
   it("keeps draft CRUD as learner work instead of starter output", () => {
     render(<App />);
 
